@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REJEEN STORE — VIP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080808;
+    --surface: #0f0f0f;
+    --border: #1e1e1e;
+    --accent: #c8ff00;
+    --text: #e8e8e8;
+    --muted: #555;
+    --hover: #161616;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 28px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: rgba(8,8,8,0.95);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+
+  .logo { font-weight: 800; font-size: 22px; letter-spacing: 0.12em; color: var(--accent); text-transform: uppercase; text-decoration: none; }
+  .logo span { color: var(--text); }
+
+  .top-nav { display: flex; align-items: center; gap: 2px; }
+  .nav-link { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); text-decoration: none; padding: 7px 14px; border: 1px solid transparent; transition: all 0.2s; white-space: nowrap; }
+  .nav-link:hover { color: var(--text); border-color: var(--border); background: var(--hover); }
+  .nav-link.active { color: var(--accent); border-color: rgba(200,255,0,0.25); background: rgba(200,255,0,0.04); }
+  .nav-link.discord-nav { display: inline-flex; align-items: center; gap: 7px; color: #5865F2; }
+  .nav-link.discord-nav:hover { border-color: #5865F2; background: rgba(88,101,242,0.06); color: #5865F2; }
+  .nav-link.discord-nav svg { width: 16px; height: 13px; color: #5865F2; flex-shrink: 0; }
+
+  /* ── Gate (ekran logowania) ── */
+  #gate {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 89px);
+    padding: 40px 24px;
+  }
+
+  .gate-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 48px 40px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .gate-icon {
+    font-size: 40px;
+    margin-bottom: 20px;
+  }
+
+  .gate-box h2 {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+
+  .gate-box p {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.8;
+    margin-bottom: 32px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .discord-login-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #5865F2;
+    color: #fff;
+    text-decoration: none;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 16px 28px;
+    transition: all 0.2s;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .discord-login-btn:hover {
+    background: #4752c4;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(88,101,242,0.3);
+  }
+
+  .discord-login-btn svg { width: 20px; height: 16px; color: #fff; flex-shrink: 0; }
+
+  .error-msg {
+    margin-top: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: #ff4d6a;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: none;
+  }
+
+  /* ── VIP content ── */
+  #vip-content {
+    display: none;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 64px 48px 96px;
+  }
+
+  .page-header {
+    margin-bottom: 48px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .page-header h1 { font-weight: 800; font-size: 42px; letter-spacing: -0.03em; margin-bottom: 10px; }
+  .page-header p { color: var(--muted); font-size: 13px; font-family: 'Space Mono', monospace; }
+
+  /* User badge */
+  .user-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    flex-shrink: 0;
+  }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--border);
+    overflow: hidden;
+  }
+
+  .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+  .user-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .user-role {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .logout-btn {
+    background: none;
+    border: none;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 4px 0;
+    transition: color 0.2s;
+  }
+
+  .logout-btn:hover { color: #ff4d6a; }
+
+  /* Snippets */
+  .category { margin-bottom: 48px; }
+
+  .category-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .category-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .snippet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: 2px;
+    transition: border-color 0.2s;
+    overflow: hidden;
+  }
+
+  .snippet-card:hover { border-color: #2a2a2a; }
+
+  .snippet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    gap: 16px;
+    cursor: pointer;
+  }
+
+  .snippet-title { font-size: 13px; font-weight: 700; letter-spacing: 0.03em; }
+  .snippet-desc { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 3px; }
+
+  .copy-btn {
+    flex-shrink: 0;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0.4;
+    white-space: nowrap;
+  }
+
+  .snippet-card:hover .copy-btn { opacity: 1; }
+  .copy-btn:hover { background: var(--accent); border-color: var(--accent); color: #000; }
+  .copy-btn.copied { background: rgba(200,255,0,0.1); border-color: var(--accent); color: var(--accent); opacity: 1; }
+
+  .snippet-body {
+    padding: 14px 20px 18px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: #888;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    word-break: break-word;
+    border-top: 1px solid var(--border);
+    display: none;
+  }
+
+  .snippet-card.expanded .snippet-body { display: block; }
+  .expand-icon { color: var(--muted); font-size: 12px; transition: transform 0.2s; flex-shrink: 0; }
+  .snippet-card.expanded .expand-icon { transform: rotate(180deg); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: var(--accent);
+    color: #000;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 10px 20px;
+    opacity: 0;
+    transition: all 0.25s ease;
+    pointer-events: none;
+    z-index: 999;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Footer */
+  footer { border-top: 1px solid var(--border); padding: 24px 48px; display: flex; justify-content: space-between; align-items: center; }
+  footer span { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
+  .footer-discord { display: flex; align-items: center; gap: 8px; text-decoration: none; padding: 6px 12px; border: 1px solid transparent; transition: all 0.2s; }
+  .footer-discord:hover { border-color: #5865F2; background: rgba(88,101,242,0.06); }
+  .footer-discord svg { width: 20px; height: 20px; color: #5865F2; }
+  .footer-discord span { font-family: 'Space Mono', monospace; font-size: 11px; color: #5865F2 !important; letter-spacing: 0.08em; }
+
+  @media (max-width: 768px) {
+    header { padding: 14px 16px; gap: 10px; }
+    .logo { font-size: 18px; }
+    .top-nav { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .top-nav::-webkit-scrollbar { display: none; }
+    .nav-link { font-size: 10px; padding: 6px 10px; }
+    #vip-content { padding: 28px 16px 64px; }
+    .page-header h1 { font-size: 28px; }
+    .gate-box { padding: 32px 20px; }
+    footer { padding: 20px 16px; flex-direction: column; gap: 12px; text-align: center; }
+    .footer-discord { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast">Skopiowano!</div>
+
+<header>
+  <a href="/" class="logo">REJEEN<span>STORE</span></a>
+  <nav class="top-nav">
+    <a href="/" class="nav-link">Sklep</a>
+    <a href="/2fa" class="nav-link">2FA</a>
+    <a href="/metody" class="nav-link">Metody</a>
+    <a href="/schowek" class="nav-link">Schowek</a>
+    <a href="/vip" class="nav-link active">VIP</a>
+    <a href="/discord" class="nav-link discord-nav">
+      <svg viewBox="0 0 127.14 96.36" xmlns="http://www.w3.org/2000/svg"><defs><mask id="wm_nav"><rect width="127.14" height="96.36" fill="white"/><ellipse cx="42.45" cy="53" rx="11" ry="12" fill="black"/><ellipse cx="84.69" cy="53" rx="11" ry="12" fill="black"/></mask></defs><path fill="currentColor" mask="url(#wm_nav)" d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07Z"/></svg>
+      Discord
+    </a>
+  </nav>
+</header>
+
+<!-- EKRAN LOGOWANIA -->
+<div id="gate">
+  <div class="gate-box">
+    <div class="gate-icon">🔒</div>
+    <h2>Strefa VIP</h2>
+    <p>Ta sekcja jest dostępna tylko<br>dla posiadaczy roli <strong style="color:var(--accent)">comet</strong><br>na serwerze Discord.</p>
+    <a href="/api/login" class="discord-login-btn">
+      <svg viewBox="0 0 127.14 96.36" xmlns="http://www.w3.org/2000/svg"><defs><mask id="wm_btn"><rect width="127.14" height="96.36" fill="white"/><ellipse cx="42.45" cy="53" rx="11" ry="12" fill="black"/><ellipse cx="84.69" cy="53" rx="11" ry="12" fill="black"/></mask></defs><path fill="currentColor" mask="url(#wm_btn)" d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07Z"/></svg>
+      Zaloguj przez Discord
+    </a>
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+</div>
+
+<!-- VIP ZAWARTOŚĆ (ukryta dopóki nie zalogowany) -->
+<div id="vip-content">
+  <div class="page-header">
+    <div>
+      <h1>Strefa VIP</h1>
+      <p>// rola comet · zawartość tylko dla ciebie</p>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+      <div class="user-badge" id="userBadge">
+        <div class="user-avatar" id="userAvatar"></div>
+        <div>
+          <div class="user-name" id="userName">...</div>
+          <div class="user-role">● comet</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="logout()">Wyloguj</button>
+    </div>
+  </div>
+
+  <!-- ══ TUTAJ WKLEJASZ SWOJE TREŚCI ══════════════════════════════ -->
+
+  <div class="category">
+    <div class="category-label">Kategoria 1</div>
+
+    <div class="snippet-card" id="v1">
+      <div class="snippet-header" onclick="toggle('v1')">
+        <div>
+          <div class="snippet-title">Tytuł wpisu</div>
+          <div class="snippet-desc">opis</div>
+        </div>
+        <button class="copy-btn" onclick="copySnippet(event, 'Treść do skopiowania')">Kopiuj</button>
+        <span class="expand-icon">▼</span>
+      </div>
+      <div class="snippet-body">Treść do skopiowania</div>
+    </div>
+
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+
+</div>
+
+<footer>
+  <span>© 2025 REJEEN STORE</span>
+  <a href="/discord" class="footer-discord">
+    <svg viewBox="0 0 127.14 96.36" xmlns="http://www.w3.org/2000/svg"><defs><mask id="wm_f"><rect width="127.14" height="96.36" fill="white"/><ellipse cx="42.45" cy="53" rx="11" ry="12" fill="black"/><ellipse cx="84.69" cy="53" rx="11" ry="12" fill="black"/></mask></defs><path fill="currentColor" mask="url(#wm_f)" d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07Z"/></svg>
+    <span>discord.gg/HMNq6Jzx8e</span>
+  </a>
+</footer>
+
+<script>
+// ── Sprawdź sesję przy załadowaniu strony ──────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  // Sprawdź czy jest błąd w URL (np. ?error=no_role)
+  const params = new URLSearchParams(window.location.search);
+  const error = params.get('error');
+
+  if (error) {
+    const messages = {
+      no_role: 'Nie masz roli comet na serwerze.',
+      not_member: 'Nie jesteś członkiem serwera Discord.',
+      no_code: 'Błąd autoryzacji — spróbuj ponownie.',
+      token_failed: 'Błąd połączenia z Discordem.',
+      server_error: 'Błąd serwera — spróbuj ponownie.',
+    };
+    const el = document.getElementById('errorMsg');
+    el.textContent = messages[error] || 'Nieznany błąd.';
+    el.style.display = 'block';
+    // Wyczyść URL
+    window.history.replaceState({}, '', '/vip');
+    return;
+  }
+
+  // Sprawdź czy jest ważna sesja
+  try {
+    const res = await fetch('/api/check');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.ok) {
+        showVip(data);
+        return;
+      }
+    }
+  } catch (e) {}
+
+  // Nie zalogowany — pokaż gate
+  showGate();
+});
+
+function showGate() {
+  document.getElementById('gate').style.display = 'flex';
+  document.getElementById('vip-content').style.display = 'none';
+}
+
+function showVip(user) {
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('vip-content').style.display = 'block';
+
+  // Wypełnij dane użytkownika
+  document.getElementById('userName').textContent = user.username;
+  const avatarEl = document.getElementById('userAvatar');
+  if (user.avatar) {
+    avatarEl.innerHTML = `<img src="https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png" alt="${user.username}">`;
+  } else {
+    avatarEl.textContent = user.username[0].toUpperCase();
+    avatarEl.style.cssText += 'display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-weight:800;font-size:14px;color:var(--accent);background:rgba(200,255,0,0.1)';
+  }
+}
+
+function logout() {
+  document.cookie = 'rejeen_session=; Path=/; Max-Age=0';
+  showGate();
+}
+
+// ── Snippets ──────────────────────────────────────────────────────────────
+function toggle(id) {
+  document.getElementById(id).classList.toggle('expanded');
+}
+
+function copySnippet(e, text) {
+  e.stopPropagation();
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = e.target;
+    btn.textContent = 'Skopiowano!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Kopiuj'; btn.classList.remove('copied'); }, 1800);
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 1800);
+  });
+}
+</script>
+</body>
+</html>
