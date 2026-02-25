@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REJEEN STORE — Metody płatności</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080808;
+    --surface: #0f0f0f;
+    --border: #1e1e1e;
+    --accent: #c8ff00;
+    --text: #e8e8e8;
+    --muted: #555;
+    --hover: #161616;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 28px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: rgba(8,8,8,0.95);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+
+  .logo {
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+  .logo span { color: var(--text); }
+
+  .header-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .content {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 64px 48px 96px;
+  }
+
+  .page-header {
+    margin-bottom: 56px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-header h1 {
+    font-weight: 800;
+    font-size: 42px;
+    letter-spacing: -0.03em;
+    margin-bottom: 10px;
+  }
+
+  .page-header p {
+    color: var(--muted);
+    font-size: 13px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .methods-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 2px;
+    margin-bottom: 48px;
+  }
+
+  .method-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 32px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .method-card:hover {
+    border-color: #2a2a2a;
+    background: var(--hover);
+  }
+
+  .method-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .method-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+    font-size: 22px;
+  }
+
+  .method-icon.blik { background: rgba(227,0,40,0.06); border-color: rgba(227,0,40,0.2); }
+  .method-icon.paypal { background: rgba(0,112,187,0.06); border-color: rgba(0,112,187,0.2); }
+  .method-icon.crypto { background: rgba(247,147,26,0.06); border-color: rgba(247,147,26,0.2); }
+
+  .method-name {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+
+  .method-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .method-tag.blik { color: #e30028; }
+  .method-tag.paypal { color: #0070bb; }
+  .method-tag.crypto { color: #f7931a; }
+
+  .method-desc {
+    color: #999;
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+
+  .method-details {
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+
+  .detail-row:last-child { border-bottom: none; }
+
+  .detail-key {
+    font-family: 'Space Mono', monospace;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+
+  .detail-val {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 12px;
+  }
+
+  .badge {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+
+  .badge.green { background: rgba(200,255,0,0.1); color: var(--accent); }
+  .badge.blue { background: rgba(0,112,187,0.12); color: #4db8ff; }
+  .badge.orange { background: rgba(247,147,26,0.12); color: #f7931a; }
+  .badge.red { background: rgba(227,0,40,0.1); color: #ff4d6a; }
+
+  /* Crypto coins list */
+  .coins-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .coin {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+
+  .coin:hover { border-color: #f7931a; color: #f7931a; }
+
+  /* Info box */
+  .info-box {
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 20px 24px;
+    margin-top: 40px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .info-box-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .info-box-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.8;
+    letter-spacing: 0.04em;
+  }
+
+  .info-box-text strong {
+    color: var(--text);
+    display: block;
+    margin-bottom: 4px;
+    font-size: 12px;
+  }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  footer span {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .footer-discord {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: all 0.2s;
+    padding: 6px 12px;
+    border: 1px solid transparent;
+  }
+
+  .footer-discord:hover {
+    border-color: #5865F2;
+    background: rgba(88,101,242,0.06);
+  }
+
+  .footer-discord svg {
+    width: 20px;
+    height: 20px;
+    color: #5865F2;
+    transition: transform 0.2s;
+  }
+
+  .footer-discord:hover svg { transform: scale(1.1); }
+
+  .footer-discord span {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: #5865F2 !important;
+    letter-spacing: 0.08em;
+  }
+
+  @media (max-width: 768px) {
+    header { padding: 20px 24px; }
+    .content { padding: 32px 24px 64px; }
+    .methods-grid { grid-template-columns: 1fr; }
+    footer { padding: 20px 24px; flex-direction: column; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="logo">REJEEN<span>STORE</span></a>
+  <div class="header-tag">// metody płatności</div>
+</header>
+
+<div class="content">
+  <div class="page-header">
+    <h1>Metody płatności</h1>
+    <p>// akceptowane formy zapłaty · szybko i bezpiecznie</p>
+  </div>
+
+  <div class="methods-grid">
+
+    <!-- BLIK -->
+    <div class="method-card">
+      <div class="method-header">
+        <div class="method-icon blik">🇵🇱</div>
+        <div>
+          <div class="method-name">BLIK</div>
+          <div class="method-tag blik">● Dostępny · Polska</div>
+        </div>
+      </div>
+      <p class="method-desc">
+        Najszybsza metoda dla polskich kupujących. Płatność jednorazowym kodem generowanym w aplikacji bankowej — bez podawania danych karty.
+      </p>
+      <div class="method-details">
+        <div class="detail-row">
+          <span class="detail-key">Czas realizacji</span>
+          <span class="detail-val"><span class="badge green">Natychmiastowy</span></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">Prowizja</span>
+          <span class="detail-val">Brak</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">Min. kwota</span>
+          <span class="detail-val">0.01 PLN</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">Jak zapłacić</span>
+          <span class="detail-val">Przez Discord</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYPAL F&F -->
+    <div class="method-card">
+      <div class="method-header">
+        <div class="method-icon paypal">🅿️</div>
+        <div>
+          <div class="method-name">PayPal F&F</div>
+          <div class="method-tag paypal">● Friends & Family</div>
+        </div>
+      </div>
+      <p class="method-desc">
+        PayPal w trybie "Friends & Family" — bez możliwości zwrotu przez PayPal. Dostępny dla kupujących z całego świata. Wymagane konto PayPal z saldem lub kartą.
+      </p>
+      <div class="method-details">
+        <div class="detail-row">
+          <span class="detail-key">Czas realizacji</span>
+          <span class="detail-val"><span class="badge green">Natychmiastowy</span></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">Prowizja</span>
+          <span class="detail-val">Brak</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">Waluta</span>
+          <span class="detail-val">PLN / EUR / USD</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">Zasięg</span>
+          <span class="detail-val"><span class="badge blue">Międzynarodowy</span></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">Uwaga</span>
+          <span class="detail-val"><span class="badge red">Tylko F&F</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CRYPTO -->
+    <div class="method-card">
+      <div class="method-header">
+        <div class="method-icon crypto">₿</div>
+        <div>
+          <div class="method-name">Kryptowaluty</div>
+          <div class="method-tag crypto">● Crypto · Anonimowo</div>
+        </div>
+      </div>
+      <p class="method-desc">
+        Płatność kryptowalutami — pełna anonimowość, brak granic. Adres portfela podawany indywidualnie przez Discord po ustaleniu zamówienia.
+      </p>
+      <div class="method-details">
+        <div class="detail-row">
+          <span class="detail-key">Czas realizacji</span>
+          <span class="detail-val"><span class="badge orange">Po potwierdzeniu</span></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">Prowizja</span>
+          <span class="detail-val">Opłata sieci</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">Zasięg</span>
+          <span class="detail-val"><span class="badge blue">Globalny</span></span>
+        </div>
+      </div>
+      <div class="coins-grid">
+        <span class="coin">BTC</span>
+        <span class="coin">ETH</span>
+        <span class="coin">USDT</span>
+        <span class="coin">USDC</span>
+        <span class="coin">LTC</span>
+        <span class="coin">SOL</span>
+        <span class="coin">XMR</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="info-box">
+    <div class="info-box-icon">💬</div>
+    <div class="info-box-text">
+      <strong>Jak dokonać zakupu?</strong>
+      Wszystkie płatności realizowane są przez nasz serwer Discord. Napisz do nas, podaj co chcesz kupić, a my wyślemy dane do płatności. Po potwierdzeniu przelewu — dostęp natychmiast.
+      <br><br>
+      <a href="/discord" style="color: #5865F2; text-decoration: none; letter-spacing: 0.06em;">→ discord.gg/HMNq6Jzx8e</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>© 2025 REJEEN STORE</span>
+  <a href="/discord" class="footer-discord">
+    <svg viewBox="0 0 127.14 96.36" xmlns="http://www.w3.org/2000/svg">
+      <defs><mask id="wm_footer"><rect width="127.14" height="96.36" fill="white"/><ellipse cx="42.45" cy="53" rx="11" ry="12" fill="black"/><ellipse cx="84.69" cy="53" rx="11" ry="12" fill="black"/></mask></defs>
+      <path fill="currentColor" mask="url(#wm_footer)" d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07Z"/>
+    </svg>
+    <span>discord.gg/HMNq6Jzx8e</span>
+  </a>
+</footer>
+
+</body>
+</html>
